@@ -2,18 +2,20 @@ import pygame
 import random
 import copy
 
+from sprites import *
 from settings import *
 
-class Othello():
+
+class Go():
   def __init__(self):
     pygame.init()
     self.screen = pygame.display.set_mode((1100, 800))
-    pygame.display.set_caption('Othello')
+    pygame.display.set_caption('Go')
 
-    self.rows = GRID_SIZE
-    self.cols = GRID_SIZE
+    self.rows = NUM_ROWS_AND_COLS
+    self.cols = NUM_ROWS_AND_COLS
 
-    self.grid = Grid(self.rows, self.cols, (80, 80), self)
+    self.grid = Grid(self.rows, self.cols, (WIDTH, HEIGHT), self)
 
     self.RUN = True
 
@@ -71,7 +73,7 @@ class Grid:
     
 
   def printGameLogicBoard(self):
-    chars = [chr(i) for i in range(ord('A'), ord('A') + GRID_SIZE)]
+    chars = [chr(i) for i in range(ord('A'), ord('A') + NUM_ROWS_AND_COLS)]
 
     # Construct the column headers
     output_string = "  |"
@@ -92,6 +94,6 @@ class Grid:
   
 
 if __name__ == '__main__':
-  game = Othello()
+  game = Go()
   game.run()
   pygame.quit()

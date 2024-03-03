@@ -50,7 +50,7 @@ class Grid:
             ['C2', 'D2', 'D2', 'D2', 'D2', 'D2', 'D2', 'D2', 'D2', 'E2'],
     ]
 
-    image = pygame.Surface((960, 960))
+    image = pygame.Surface((800, 800))
     for j, row in enumerate(gridBg):
       for i, img in enumerate(row):
         image.blit(self.bg[img], (i * self.size[0], j * self.size[1]))

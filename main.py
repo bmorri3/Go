@@ -46,8 +46,11 @@ class Go():
         if event.button == 1:
           x, y = pygame.mouse.get_pos()
           x, y = (x - TILESIZE) // TILESIZE, (y - TILESIZE) // TILESIZE
-          self.grid.insertToken(self.grid.gridLogic, self.curPlayer, y, x)
-          self.curPlayer *= -1
+          print("tokens:", self.grid.tokens)
+          if 0 <= x < NUM_ROWS_AND_COLS and 0 <= y < NUM_ROWS_AND_COLS and not self.grid.tokens.get((y,x)):
+            self.grid.insertToken(self.grid.gridLogic, self.curPlayer, y, x)
+            self.curPlayer *= -1
+
 
   def update(self):
     pass

@@ -13,6 +13,11 @@ class Go():
     self.screen = pygame.display.set_mode((800, 800))
     pygame.display.set_caption(TITLE)
 
+    self.player1 = 1
+    self.player2 = -1
+
+    self.curPlayer = 1
+
     self.rows = NUM_ROWS_AND_COLS
     self.cols = NUM_ROWS_AND_COLS
 
@@ -37,6 +42,14 @@ class Go():
         if event.button == 3:
           print("right click")
           self.grid.printGameLogicBoard()
+
+        if event.button == 1:
+          x, y = pygame.mouse.get_pos()
+          x, y = (x - TILESIZE) // TILESIZE, (y - TILESIZE) // TILESIZE
+          print("tokens:", self.grid.tokens)
+          if 0 <= x < NUM_ROWS_AND_COLS and 0 <= y < NUM_ROWS_AND_COLS and not self.grid.tokens.get((y,x)):
+            self.grid.insertToken(self.grid.gridLogic, self.curPlayer, y, x)
+            self.curPlayer *= -1
 
 
   def update(self):

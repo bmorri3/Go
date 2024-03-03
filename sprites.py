@@ -17,11 +17,10 @@ class Grid:
     self.GAME = main
     self.x = rows
     self.y = cols
-    self.size = size
-        
+    self.size = size        
     self.bg = self.loadBackGroundImages()
+    self.tokens = {}
     self.gridBg = self.createbgimg()
-
     self.gridLogic = self.regenGrid(self.x, self.y)
 
 
@@ -51,7 +50,7 @@ class Grid:
             ['C2', 'D2', 'D2', 'D2', 'D2', 'D2', 'D2', 'D2', 'D2', 'E2'],
     ]
 
-    image = pygame.Surface((960, 960))
+    image = pygame.Surface((800, 800))
     for j, row in enumerate(gridBg):
       for i, img in enumerate(row):
         image.blit(self.bg[img], (i * self.size[0], j * self.size[1]))
@@ -67,6 +66,10 @@ class Grid:
         line.append(0)  
       grid.append(line)
 
+    self.insertToken(grid, 1, 3, 3)
+    self.insertToken(grid, -1, 3, 4)
+    self.insertToken(grid, 1, 4, 4)
+    self.insertToken(grid, -1, 4, 3)
 
     return grid
       # Create an array of characters from 'A' to GRID_SIZE (inclusive)
@@ -74,6 +77,9 @@ class Grid:
 
   def drawGrid(self, window):
     window.blit(self.gridBg, (0, 0))
+
+    for token in self.tokens.values():
+      token.draw(window)
 
 
   def printGameLogicBoard(self):
@@ -92,5 +98,28 @@ class Grid:
       for item in row:
         line += f"{item}".center(3, " ") + "|"
       print(line)
-
     print()
+
+
+  def insertToken(self, grid, curplayer, y, x):
+    tokenImage = white_token if curplayer == 1 else black_token
+    self.tokens[(y, x)] = Token(curplayer, y, x, tokenImage, self.GAME)
+    grid[y][x] = self.tokens[(y, x)].player
+
+
+
+class Token:
+    def __init__(self, player, gridX, gridY, image, main):
+      self.player = player
+      self.gridX = gridX
+      self.gridY = gridY
+      self.posX = TILESIZE + (gridY * TILESIZE)
+      self.posY = TILESIZE + (gridX * TILESIZE)
+      self.game = main
+      self.image = image
+
+    def transition(self):
+      pass
+
+    def draw(self, window):
+      window.blit(self.image, (self.posX, self.posY))

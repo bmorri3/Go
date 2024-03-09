@@ -9,7 +9,7 @@ from settings import *
 
 
 
-class Go():
+class Pente():
   def __init__(self):
     pygame.init()
     self.screen = pygame.display.set_mode((800, 800))
@@ -124,7 +124,7 @@ class Go():
 if __name__ == '__main__':
   
   while True:
-    game = Go()
+    game = Pente()
     game.run()
     print("NEW GAME")
   

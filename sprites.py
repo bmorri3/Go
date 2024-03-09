@@ -3,6 +3,24 @@ import pygame
 from settings import *
 
 
+def directions(x, y):
+  """ Check to determine which directions are valid from the current cell """
+  minX = 0
+  minY = 0
+  maxX = NUM_ROWS_AND_COLS - 1
+  maxY = NUM_ROWS_AND_COLS - 1
+  valid_directions = []
+
+  for dx in range(-1, 2):
+    for dy in range(-1, 2):
+      if dx == 0 and dy == 0:
+        continue  # Skip the case where dx and dy are both 0
+      new_x, new_y = x + dx, y + dy
+      if minX <= new_x <= maxX and minY <= new_y <= maxY:
+        valid_directions.append((new_x, new_y))
+
+  return valid_directions
+  
 
 def loadSpriteSheet(sheet, row, col, newSize, size):
   """ Creates a blank surface and loads and returns a portion of the spritesheet on to the surface. """
@@ -11,6 +29,11 @@ def loadSpriteSheet(sheet, row, col, newSize, size):
   image = pygame.transform.scale(image, newSize)
   image.set_colorkey('Black')
   return image
+
+def cellInRange(x, y):
+  return 0 <= x < NUM_ROWS_AND_COLS and 0 <= y < NUM_ROWS_AND_COLS
+
+
 
 class Grid:
   def __init__(self, rows, cols, size, main):   
@@ -66,14 +89,8 @@ class Grid:
         line.append(0)  
       grid.append(line)
 
-    self.insertToken(grid, 1, 3, 3)
-    self.insertToken(grid, -1, 3, 4)
-    self.insertToken(grid, 1, 4, 4)
-    self.insertToken(grid, -1, 4, 3)
-
     return grid
-      # Create an array of characters from 'A' to GRID_SIZE (inclusive)
-    
+
 
   def drawGrid(self, window):
     window.blit(self.gridBg, (0, 0))
@@ -101,11 +118,106 @@ class Grid:
     print()
 
 
-  def insertToken(self, grid, curplayer, y, x):
+  def findValidCells(self, grid, curPlayer):
+    """ Performs a check to find all empty cells that are adjacent to opposing player """
+    validCellToClick = []
+    for gridX, row in enumerate(grid):
+      for gridY, col in enumerate(row):
+        if grid[gridX][gridY] != 0:
+          continue
+        DIRECTIONS = directions(gridX, gridY)
+
+        for direction in DIRECTIONS:
+          dirX, dirY = direction
+          checkedCell = grid[dirX][dirY]
+
+          if checkedCell == 0 or checkedCell == curPlayer:
+            continue
+
+          if (gridX, gridY) in validCellToClick:
+            continue
+          
+          validCellToClick.append((gridX, gridY))
+
+    return validCellToClick
+
+
+  def remove_tokens_if_taken(self, grid, y, x, curPlayer):
+
+    tokens_taken = 0
+
+    # Loop through all adjacent cells to current token   
+    for dx in range(-1, 2):
+      for dy in range(-1, 2):
+        if dx == 0 and dy == 0:
+          continue  # Skip the case where dx and dy are both 0
+        
+        # If the token is the opponent's
+        new_x, new_y = x + dx, y + dy
+        if cellInRange(new_x, new_y) and grid[new_y][new_x] == curPlayer * -1:
+
+          # Check if the next token in the same direction is the opponent's
+          new_x, new_y = new_x + dx, new_y + dy
+          if cellInRange(new_x, new_y) and grid[new_y][new_x] == curPlayer * -1:            
+            
+            # Check if the third token in the same direction is the player's
+            new_x, new_y = new_x + dx, new_y + dy
+            if cellInRange(new_x, new_y) and grid[new_y][new_x] == curPlayer:
+              
+              # Remove the previous token              
+              new_x, new_y = new_x - dx, new_y - dy
+              self.tokens.pop((new_y, new_x))
+              grid[new_y][new_x] = 0
+
+              # Remove the token before the previous token              
+              new_x, new_y = new_x - dx, new_y - dy
+              self.tokens.pop((new_y, new_x))
+              grid[new_y][new_x] = 0
+
+              tokens_taken += 2
+
+    return tokens_taken
+
+
+  def insert_token(self, grid, curplayer, y, x):
     tokenImage = white_token if curplayer == 1 else black_token
     self.tokens[(y, x)] = Token(curplayer, y, x, tokenImage, self.GAME)
     grid[y][x] = self.tokens[(y, x)].player
 
+    for gridX, row in enumerate(grid):
+      for gridY, col in enumerate(row):
+        if grid[gridX][gridY] != 0:
+          continue
+        DIRECTIONS = directions(gridX, gridY)
+
+        for direction in DIRECTIONS:
+          dirX, dirY = direction
+          checkedCell = grid[dirX][dirY]
+
+  
+  def check_for_in_a_row(self, grid, curPlayer, y, x):
+         
+    # Loop through all adjacent cells to current token   
+    for dx in range(-1, 2):
+      for dy in range(-1, 2):
+        if dx == 0 and dy == 0:
+          continue  # Skip the case where dx and dy are both 0
+        
+        in_a_row = 1
+        new_x, new_y = x + dx, y + dy
+
+        while in_a_row <= IN_A_ROW_TO_WIN:
+          if cellInRange(new_x, new_y) and grid[new_y][new_x] == curPlayer:
+            in_a_row += 1
+            new_x += dx
+            new_y += dy
+          else:
+            break
+
+        if in_a_row >= IN_A_ROW_TO_WIN:
+          return True
+          
+    return False
 
 
 class Token:

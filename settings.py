@@ -8,6 +8,8 @@ WIDTH = TILESIZE * NUM_ROWS_AND_COLS + 1
 HEIGHT = TILESIZE * NUM_ROWS_AND_COLS + 1
 TITLE = "Go"
 ALPHA = 'ABCDEFGHI'
+TOKENS_TO_WIN = 10
+IN_A_ROW_TO_WIN = 4
 
 # Load and scale images
 white_token = pygame.transform.scale(pygame.image.load(os.path.join("assets", "WhiteToken.png")), (TILESIZE, TILESIZE))

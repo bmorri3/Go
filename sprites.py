@@ -184,16 +184,6 @@ class Grid:
     self.tokens[(y, x)] = Token(curplayer, y, x, tokenImage, self.GAME)
     grid[y][x] = self.tokens[(y, x)].player
 
-    for gridX, row in enumerate(grid):
-      for gridY, col in enumerate(row):
-        if grid[gridX][gridY] != 0:
-          continue
-        DIRECTIONS = directions(gridX, gridY)
-
-        for direction in DIRECTIONS:
-          dirX, dirY = direction
-          checkedCell = grid[dirX][dirY]
-
   
   def check_for_in_a_row(self, grid, curPlayer, y, x):
          
